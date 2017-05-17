@@ -51,6 +51,14 @@ class Perceptron(Classifier):
     def train(self, verbose=True):
         """Train the perceptron with the perceptron learning algorithm.
 
+        for testImage in self.trainingSet:
+
+            
+       
+        while False:
+            self.weight = self.weight
+
+        
         Parameters
         ----------
         verbose : boolean
@@ -61,6 +69,11 @@ class Perceptron(Classifier):
         pass
 
     def classify(self, testInstance):
+        weightList = self.weight
+        testInstanceArray = np.asarray(testInstance)
+        weightArray = np.asarray(weightList)
+        dotProduct = np.dot(testInstanceArray, weightArray)
+
         """Classify a single instance.
 
         Parameters
@@ -73,7 +86,7 @@ class Perceptron(Classifier):
             True if the testInstance is recognized as a 7, False otherwise.
         """
         # Write your code to do the classification on an input image
-        pass
+        return dotProduct > 0
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
