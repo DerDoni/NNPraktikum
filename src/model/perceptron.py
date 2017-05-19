@@ -45,40 +45,32 @@ class Perceptron(Classifier):
         self.testSet = test
 
         # Initialize the weight vector with small random values
-        # around 0 and 0.1
+        # around 0 and0.1
         self.weight = np.random.rand(self.trainingSet.input.shape[1])/100
 
     def train(self, verbose=True):
-        """Train the perceptron with the perceptron learning algorithm."""
+        """Train the perceptron with the perceptron learning algorithm.
 
-        for j in range(self.epochs):
-            error = np.empty([783], dtype=float)
-            for testImage in self.trainingSet:
-                isSeven = (6.9 < testImage[0]) & (testImage[0] < 7.1)
-                if self.classify(testImage) != isSeven :
-                    error = np.add(error, np.asarray(testImage[1:]))
-            self.updateWeights(0, error)
-
-        """
-        while False:
-            self.weight = self.weight
-        
-        
         Parameters
         ----------
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        
-        # Write your code to train the perceptron here
-        pass
+        # Initialize step counter and stop criteria
+        stepCount = 0
+        errorV = 1
+        # As long as max Step not reached and the error of the validation set is positive
+        while((stepCount<self.epochs)&(errorV>0)):
+            #Compute which elements are wrongly classified
+            error = self.classify(self.trainingSet.input)-self.trainingSet.label
+            self.updateWeights(self.trainingSet.input, error)
+            #Compute the error in the validation set
+            errorV = np.sum(self.classify(self.validationSet.input)!=self.validationSet.label)
+            if(verbose):
+                print "Absolute error in epoch {}: {}".format(stepCount, errorV)
+            stepCount += 1
 
     def classify(self, testInstance):
-        testInstanceArray = np.asarray(testInstance[1:])
-        weightArray = np.asarray(self.weight[1:])
-        dotProduct = np.dot(testInstanceArray, weightArray)
-        threshold = self.weight[1]
-
         """Classify a single instance.
 
         Parameters
@@ -90,8 +82,7 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        # Write your code to do the classification on an input image
-        return dotProduct >= 0
+        return self.fire(testInstance)
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -113,11 +104,10 @@ class Perceptron(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        self.weight[1:] = self.weight[1:] - self.learningRate*error
-        self.weight[0] = self.weight[0] - self.learningRate*input
         # Write your code to update the weights of the perceptron here
-        pass
+        sumErr = np.matmul(np.transpose(input),error)
+        self.weight = self.weight - self.learningRate*sumErr
          
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
-        return Activation.sign(np.dot(np.array(input), self.weight))
+        return Activation.sign(np.matmul(np.array(input),np.array(self.weight)))
