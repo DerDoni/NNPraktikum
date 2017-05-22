@@ -56,20 +56,21 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        # Initialize step counter and stop criteria
-        stepCount = 0
-        errorV = 1
-        # As long as max Step not reached and the error of the validation set is positive
-        while((stepCount<self.epochs)&(errorV>0)):
+        minError = 1000
+        # As long as max Step not reached
+        for i in range(0, self.epochs):
             #Compute which elements are wrongly classified
             error = self.classify(self.trainingSet.input)-self.trainingSet.label
             self.updateWeights(self.trainingSet.input, error)
             #Compute the error in the validation set
             errorV = np.sum(self.classify(self.validationSet.input)!=self.validationSet.label)
+            if(errorV<=minError):
+                minWeights = self.weight
+                minError = errorV
             if(verbose):
-                print "Absolute error in epoch {}: {}".format(stepCount, errorV)
-            stepCount += 1
-
+                print "Absolute error in epoch {}: {}".format(i, errorV)
+        self.weight = minWeights
+		
     def classify(self, testInstance):
         """Classify a single instance.
 
