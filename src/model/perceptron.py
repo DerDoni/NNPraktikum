@@ -56,19 +56,9 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        # Initialize step counter and stop criteria
-        stepCount = 0
-        errorV = 1
-        # As long as max Step not reached and the error of the validation set is positive
-        while((stepCount<self.epochs)&(errorV>0)):
-            #Compute which elements are wrongly classified
-            error = self.classify(self.trainingSet.input)-self.trainingSet.label
-            self.updateWeights(self.trainingSet.input, error)
-            #Compute the error in the validation set
-            errorV = np.sum(self.classify(self.validationSet.input)!=self.validationSet.label)
-            if(verbose):
-                print "Absolute error in epoch {}: {}".format(stepCount, errorV)
-            stepCount += 1
+        
+        # Write your code to train the perceptron here
+        pass
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -82,7 +72,8 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        return self.fire(testInstance)
+        # Write your code to do the classification on an input image
+        pass
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -105,9 +96,8 @@ class Perceptron(Classifier):
 
     def updateWeights(self, input, error):
         # Write your code to update the weights of the perceptron here
-        sumErr = np.matmul(np.transpose(input),error)
-        self.weight = self.weight - self.learningRate*sumErr
+        pass
          
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
-        return Activation.sign(np.matmul(np.array(input),np.array(self.weight)))
+        return Activation.sign(np.dot(np.array(input), self.weight))
