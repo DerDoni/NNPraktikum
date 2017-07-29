@@ -3,7 +3,7 @@
 from __future__ import division
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import accuracy_score
-
+import numpy as np
 
 class Evaluator:
     """
@@ -22,7 +22,7 @@ class Evaluator:
 
     def printComparison(self, testSet, pred):
         for label, result in zip(testSet.label, pred):
-            print("Label: %r. Prediction: %r" % (bool(label), bool(result)))
+            print("Label: %r. Prediction: %r" % (int(np.argmax(label)), int(result)))
 
     def printClassificationResult(self, testSet, pred, targetNames):
         print(classification_report(testSet.label,
@@ -33,5 +33,6 @@ class Evaluator:
         print(confusion_matrix(testSet.label, pred))
 
     def printAccuracy(self, testSet, pred):
+        label_list = np.argmax(testSet.label, axis=1).tolist()
         print("Accuracy of the recognizer: %.2f%%" %
-              (accuracy_score(testSet.label, pred)*100))
+              (accuracy_score(label_list, pred)*100))

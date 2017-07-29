@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import numpy as np
 
 class DataSet(object):
     """
@@ -27,7 +27,7 @@ class DataSet(object):
 
         # The label of the digits is always the first fields
         # Doing normalization
-        self.input = 1.0*data[:, 1:]/255
+        self.input = (1.0 * data[:, 1:])/255
         self.label = data[:, 0]
         self.oneHot = oneHot
         self.targetDigit = targetDigit
@@ -35,9 +35,12 @@ class DataSet(object):
         # Transform all labels which is not the targetDigit to False,
         # The label of targetDigit will be True,
         if oneHot:
-            self.label = list(map(lambda a: 1 
-                            if str(a) == targetDigit else 0, 
-                            self.label))
+            #print(self.label[0])
+            oneHotEncoding = np.zeros((len(self.label), 10), dtype=np.uint8)
+            for i in range(0, len(self.label)):
+                oneHotEncoding[i, self.label[i]] = True
+            self.label = oneHotEncoding
+            #print(self.label[0])
 
     def __iter__(self):
         return self.input.__iter__()

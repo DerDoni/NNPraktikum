@@ -6,6 +6,9 @@ Activation functions which can be used within neurons.
 
 from numpy import exp
 from numpy import divide
+from numpy import ones
+from numpy import asarray
+from numpy import max
 
 
 class Activation:
@@ -19,48 +22,57 @@ class Activation:
 
     @staticmethod
     def sigmoid(netOutput):
-        # Here you have to code the sigmoid function
-        pass
+        # use e^x from numpy to avoid overflow
+        return 1/(1+exp(-1.0*netOutput))
 
     @staticmethod
     def sigmoidPrime(netOutput):
         # Here you have to code the derivative of sigmoid function
         # netOutput.*(1-netOutput)
-        pass
+        return netOutput * (1.0 - netOutput)
 
     @staticmethod
     def tanh(netOutput):
-        # Here you have to code the tanh function
-        pass
+        # return 2*Activation.sigmoid(2*netOutput)-1
+        ex = exp(1.0*netOutput)
+        exn = exp(-1.0*netOutput)
+        return divide(ex-exn, ex+exn)  # element-wise division
 
     @staticmethod
     def tanhPrime(netOutput):
         # Here you have to code the derivative of tanh function
-        pass
+        return (1-Activation.tanh(netOutput)**2)
 
     @staticmethod
     def rectified(netOutput):
-        return lambda x: max(0.0, x)
+        return asarray([max(0.0, i) for i in netOutput])
 
     @staticmethod
     def rectifiedPrime(netOutput):
-        # Here you have to code the derivative of rectified linear function
-        pass
+        # reluPrime=1 if netOutput > 0 otherwise 0
+        #print(type(netOutput))
+        return netOutput>0
 
     @staticmethod
     def identity(netOutput):
-        return lambda x: x
+        return netOutput
 
     @staticmethod
     def identityPrime(netOutput):
-        # Here you have to code the derivative of identity function
-        pass
+        # identityPrime = 1
+        return ones(netOutput.size)
 
     @staticmethod
     def softmax(netOutput):
         # Here you have to code the softmax function
+        e_x = exp(netOutput - max(netOutput))
+        return e_x / e_x.sum()
+        
+    @staticmethod
+    def softmaxPrime(netOutput):
+        # Here you have to code the softmax function
         pass
-
+        
     @staticmethod
     def getActivation(str):
         """
@@ -89,6 +101,8 @@ class Activation:
 
         if str == 'sigmoid':
             return Activation.sigmoidPrime
+        elif str == 'softmax':
+            return Activation.softmaxPrime
         elif str == 'tanh':
             return Activation.tanhPrime
         elif str == 'relu':

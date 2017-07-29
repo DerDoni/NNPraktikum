@@ -34,8 +34,7 @@ class Perceptron(Classifier):
     testSet : list
     weight : list
     """
-    def __init__(self, train, valid, test, 
-                                    learningRate=0.01, epochs=50):
+    def __init__(self, train, valid, test, learningRate=0.01, epochs=50):
 
         self.learningRate = learningRate
         self.epochs = epochs
@@ -45,9 +44,14 @@ class Perceptron(Classifier):
         self.testSet = test
 
         # Initialize the weight vector with small random values
-        # around 0 and0.1
-        self.weight = np.random.rand(self.trainingSet.input.shape[1])/100
+        # around 0 and 0.1
 
+        self.weight = np.random.rand(self.trainingSet.input.shape[1])/10
+
+        # add bias weights at the beginning with the same random initialize
+        self.weight = np.insert(self.weight, 0, np.random.rand()/10)
+
+        
     def train(self, verbose=True):
         """Train the perceptron with the perceptron learning algorithm.
 
@@ -56,21 +60,34 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        minError = 1000
-        # As long as max Step not reached
-        for i in range(0, self.epochs):
-            #Compute which elements are wrongly classified
-            error = self.classify(self.trainingSet.input)-self.trainingSet.label
-            self.updateWeights(self.trainingSet.input, error)
-            #Compute the error in the validation set
-            errorV = np.sum(self.classify(self.validationSet.input)!=self.validationSet.label)
-            if(errorV<=minError):
-                minWeights = self.weight
-                minError = errorV
-            if(verbose):
-                print "Absolute error in epoch {}: {}".format(i, errorV)
-        self.weight = minWeights
-		
+
+        # Try to use the abstract way of the framework
+        from util.loss_functions import DifferentError
+        loss = DifferentError()
+
+        learned = False
+        iteration = 0
+
+        # Train for some epochs if the error is not 0
+        while not learned:
+            totalError = 0
+            for input, label in zip(self.trainingSet.input,
+                                    self.trainingSet.label):
+                output = self.fire(input)
+                if output != label:
+                    error = loss.calculateError(label, output)
+                    self.updateWeights(input, error)
+                    totalError += error
+
+            iteration += 1
+            
+            if verbose:
+                logging.info("Epoch: %i; Error: %i", iteration, -totalError)
+            
+            if totalError == 0 or iteration >= self.epochs:
+                # stop criteria is reached
+                learned = True
+
     def classify(self, testInstance):
         """Classify a single instance.
 
@@ -105,10 +122,10 @@ class Perceptron(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        # Write your code to update the weights of the perceptron here
-        sumErr = np.matmul(np.transpose(input),error)
-        self.weight = self.weight - self.learningRate*sumErr
-         
+        self.weight += self.learningRate*error*input
+
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
-        return Activation.sign(np.matmul(np.array(input),np.array(self.weight)))
+        return Activation.sign(np.dot(np.array(input), self.weight))
+        
+        
